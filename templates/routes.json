@@ -1,0 +1,20 @@
+{
+  "routes": [
+    {
+      "route": "/profile",
+      "serve": "/profile.html"
+    },
+    {
+      "route": "/payment",
+      "serve": "/payment.html"
+    },
+    {
+      "route": "/recommendations",
+      "serve": "/recommendations.html"
+    },
+    {
+      "route": "/tryon_preview",
+      "serve": "/tryon_preview.html"
+    }
+  ]
+}
