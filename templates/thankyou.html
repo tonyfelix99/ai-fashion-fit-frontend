@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thank You – AI Fashion Fit</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="hero-section">
+        <div class="container">
+            <div class="row justify-content-center align-items-center min-vh-100">
+                <div class="col-lg-8 text-center">
+                    <h1 class="hero-title mb-4">Thank You, {{ user_name }}! 🎉</h1>
+                    <p class="hero-description mb-5">
+                        We hope you found your perfect style with AI Fashion Fit!
+                        <br><br>
+                        Your support helps us keep improving and bringing you the best fashion recommendations.
+                    </p>
+                    
+                    <div class="mb-5">
+                        <a href="upi://pay?pa={{ upi_id }}&pn=AiFashionFit&am=20.00&cu=INR&tn=Coffee" 
+                           target="_blank" 
+                           class="btn btn-primary btn-lg mb-3">
+                            Buy Me a Coffee ₹20 ☕
+                        </a>
+                        <p class="text-muted">Your generosity keeps this service running!</p>
+                    </div>
+                    
+                    <div class="d-flex gap-3 justify-content-center flex-wrap">
+                        <a href="{{ url_for('recommendations') }}" class="btn btn-outline-light">View Recommendations</a>
+                        <a href="{{ url_for('index') }}" class="btn btn-outline-light">Start Over</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

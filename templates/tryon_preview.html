@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Virtual Try-On – AI Fashion Fit</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container py-5">
+        <div class="text-center mb-5">
+            <h1 class="mb-3">Virtual Try-On Preview</h1>
+            <p class="lead">{{ outfit.name }} – How it looks on you!</p>
+        </div>
+        
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="card">
+                    <div class="card-body p-4">
+                        <div class="text-center mb-4">
+                            <img src="{{ url_for('static', filename=generated_image.replace('static/', '')) }}" 
+                                 alt="Virtual Try-On Preview" 
+                                 class="img-fluid rounded tryon-image">
+                        </div>
+                        
+                        <div class="alert alert-info">
+                            <strong>👋 Hey {{ user_name }}!</strong> This is your virtual try-on preview. 
+                            The actual outfit will look even better in person!
+                        </div>
+                        
+                        <div class="d-flex gap-2 flex-wrap mb-3">
+                            <a href="{{ generated_image }}" download class="btn btn-success flex-fill">Download Image</a>
+                            <button onclick="shareImage()" class="btn btn-primary flex-fill">Share</button>
+                        </div>
+                        
+                        <div class="text-center">
+                            <p class="mb-3">Love this look? Support us!</p>
+                            <a href="upi://pay?pa={{ upi_id }}&pn=AiFashionFit&am=20.00&cu=INR&tn=Coffee" 
+                               target="_blank" 
+                               class="btn btn-primary">
+                                Buy Me a Coffee ₹20 ☕
+                            </a>
+                        </div>
+                        
+                        <div class="text-center mt-4">
+                            <a href="{{ url_for('recommendations') }}" class="btn btn-outline-secondary">← Back to Recommendations</a>
+                            <a href="{{ url_for('thankyou') }}" class="btn btn-outline-primary ms-2">Continue →</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function shareImage() {
+            if (navigator.share) {
+                navigator.share({
+                    title: 'My Virtual Try-On - AI Fashion Fit',
+                    text: 'Check out my style with AI Fashion Fit!',
+                    url: window.location.href
+                }).catch(err => console.log('Error sharing:', err));
+            } else {
+                alert('Sharing is not supported on this browser. Copy the page URL to share!');
+            }
+        }
+    </script>
+</body>
+</html>

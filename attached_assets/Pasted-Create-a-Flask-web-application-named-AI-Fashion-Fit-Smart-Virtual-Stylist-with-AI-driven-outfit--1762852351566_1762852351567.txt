@@ -1,0 +1,154 @@
+Create a Flask web application named “AI Fashion Fit – Smart Virtual Stylist” with AI-driven outfit recommendations and a Gemini-powered virtual try-on engine. The project should include front-end templates, backend routes, category-based recommendations, and UPI deep-link payments. Use the exact file and folder structure, logic, and styling described below.
+
+🧱 Stack
+
+Backend: Python 3 + Flask
+
+Frontend: HTML + Bootstrap 5 + Custom CSS
+
+Database: SQLite3
+
+AI Integration: Google Gemini 1.5 Pro Vision + Text APIs
+
+API key stored as environment variable → GEMINI_API_KEY
+
+📁 Folder Structure /app.py /templates/ index.html profile.html recommendations.html tryon_preview.html thankyou.html /static/ /uploads/ /generated/ style.css /outfits.json
+
+⚙️ Core Requirements 🏠 1. / → Homepage
+
+Show a clean landing page:
+
+Title: “AI Fashion Fit – Your Smart Stylist”
+
+Button → “Start My Style Check” → /profile
+
+👤 2. /profile → User Info Form
+
+Form inputs:
+
+Name
+
+Age (number)
+
+Gender (dropdown)
+
+Upload Photo (image)
+
+Submit via POST to /analyze.
+
+🧠 3. /analyze → AI Image Analysis
+
+Steps:
+
+Save uploaded photo in /static/uploads/
+
+Call Gemini Vision API to return skin tone + body type in JSON format.
+
+Store everything in SQLite user_info table:
+
+CREATE TABLE user_info ( id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, age INTEGER, gender TEXT, skin_tone TEXT, body_shape TEXT, image_path TEXT );
+
+Redirect → /recommendations
+
+Gemini logic:
+
+import google.generativeai as genai, json, os genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
+
+def analyze_user_photo(img_path): model = genai.GenerativeModel("gemini-1.5-pro-latest") with open(img_path, "rb") as f: prompt = """ Describe this person in JSON: {"skin_tone": "Fair/Wheatish/Dark", "body_shape": "Slim/Average/Curvy"}. Only output JSON. """ resp = model.generate_content([prompt, f.read()]) return json.loads(resp.text)
+
+👗 4. /recommendations → Category-Based Outfits
+
+Load outfit data from outfits.json (example below).
+
+Filter by gender, age group, skin tone, body shape.
+
+Generate a one-sentence personalized reason using Gemini text model.
+
+Display each outfit in a Bootstrap card with:
+
+Image
+
+Description
+
+Personalized reason
+
+“Buy Now” link (affiliate)
+
+“Virtual Try-On ₹5” and “Buy Me a Coffee ₹10” (UPI buttons)
+
+Example outfits.json:
+
+[ { "name": "Pastel Summer Dress", "description": "Soft pastel floral dress for summer days.", "price": "₹1499", "link": "https://amzn.to/example1", "image": "https://cdn.example.com/outfits/summer.jpg", "gender": "Female", "skin_tones": ["Fair", "Wheatish"], "body_shapes": ["Slim", "Average"], "age_group": "18-30" }, { "name": "Office Chic", "description": "Formal beige trousers with pastel shirt.", "price": "₹1999", "link": "https://myntra.com/example2", "image": "https://cdn.example.com/outfits/office.jpg", "gender": "Male", "skin_tones": ["Wheatish", "Dark"], "body_shapes": ["Average", "Curvy"], "age_group": "25-45" }, { "name": "Party Night Glam", "description": "Black shimmer skirt with crop top.", "price": "₹2499", "link": "https://ajio.com/example3", "image": "https://cdn.example.com/outfits/party.jpg", "gender": "Female", "skin_tones": ["Fair", "Wheatish"], "body_shapes": ["Slim", "Curvy"], "age_group": "20-35" } ]
+
+Filtering logic:
+
+def match_outfits(user): with open("outfits.json") as f: outfits = json.load(f) matched = [] for o in outfits: min_age, max_age = map(int, o["age_group"].split("-")) if ( user["gender"].lower() == o["gender"].lower() and user["skin_tone"] in o["skin_tones"] and user["body_shape"] in o["body_shapes"] and min_age <= user["age"] <= max_age ): matched.append(o) return matched[:5]
+
+AI personalization:
+
+def explain_match(user, outfit): prompt = f""" The user is a {user['age']} year old {user['gender']} with {user['skin_tone']} skin tone and {user['body_shape']} body shape. Explain in one friendly sentence why '{outfit['name']}' suits them. """ resp = genai.GenerativeModel("gemini-1.5-pro-latest").generate_content(prompt) return resp.text
+
+UPI buttons:
+
+<a href="upi://pay?pa=tonyfelix@oksbi&pn=Tony%20Felix&am=5&cu=INR&tn=Virtual%20Try%20On" target="_blank" class="btn btn-success">Virtual Try-On ₹5</a>
+
+<a href="upi://pay?pa=tonyfelix@oksbi&pn=Tony%20Felix&am=10&cu=INR&tn=Buy%20Me%20a%20Coffee" target="_blank" class="btn btn-primary">Buy Me a Coffee ₹10</a>
+
+🧍 5. /tryon_preview → Virtual Try-On (AI Image Generation)
+
+Use Gemini to combine user photo + outfit image and generate realistic output.
+
+import requests, uuid, io
+
+def create_virtual_tryon(user_img, outfit_img_url): model = genai.GenerativeModel("gemini-1.5-pro-latest") user_data = open(user_img, "rb").read() outfit_data = requests.get(outfit_img_url).content prompt = "Generate a realistic image of person (image 1) wearing outfit (image 2)." result = model.generate_content([prompt, user_data, outfit_data]) img_data = result.candidates[0].content.parts[0].inline_data.data out_path = f"static/generated/{uuid.uuid4().hex}.jpg" with open(out_path, "wb") as f: f.write(io.BytesIO(img_data).getbuffer()) return out_path
+
+Display it on tryon_preview.html with “Download” and “Share” buttons.
+
+💖 6. /thankyou
+
+Simple thank-you page with “Buy Me Coffee ₹10” button and navigation back to recommendations.
+
+🎨 Styling Guidelines
+
+Font: Poppins
+
+Theme: Lavender (#c8a2c8) + Cream (#fffaf0)
+
+Buttons: Rounded corners, soft shadows
+
+Responsive grid layout for outfit cards
+
+🪙 Monetization
+
+All payments through GPay UPI deep links (no Razorpay or backend gateway).
+
+Optional “tip” button on thank-you page.
+
+🔒 Commented Future Extensions
+
+Replace Gemini with TryOnDiffusion or Replicate for better realism.
+
+Add real affiliate API fetch (Amazon, Myntra).
+
+Add multilingual recommendations (English/Hindi).
+
+Add webhook for real UPI payment confirmation.
+
+✅ Deliverables
+
+Fully working Flask app with all templates.
+
+Smart category-based recommendations (age + tone + gender + body).
+
+Personalized AI explanation text.
+
+Gemini Vision try-on generation.
+
+GPay micro-payment buttons.
+
+Ready to run in Cursor with .env key:
+
+GEMINI_API_KEY=your_key_here
+
+Show less
+
